@@ -1,0 +1,211 @@
+RECORDATORIOS DE C EN UBUNTU
+============================
+
+
+Un archivo .c necesita una funcion main para poder generar un programa
+ejecutable. Por ejemplo, si el archivo principal es main.c:
+
+	gcc -Wall -Wextra -std=c11 -o programa main.c
+
+Significado de las opciones:
+
+	-Wall -Wextra    muestran advertencias utiles
+	-std=c11         usa el estandar C11
+	-o programa      llama "programa" al ejecutable
+
+Ejecutar el programa:
+
+	./programa
+
+Compilar y ejecutar en una sola linea:
+
+	gcc -Wall -Wextra -std=c11 -o programa main.c && ./programa
+
+Si el programa usa varios archivos:
+
+	gcc -Wall -Wextra -std=c11 -o programa main.c lista.c
+
+Tambien se puede compilar cada archivo primero:
+
+	gcc -Wall -Wextra -std=c11 -c main.c
+	gcc -Wall -Wextra -std=c11 -c lista.c
+	gcc -o programa main.o lista.o
+
+Para detectar errores de memoria en Linux, si Valgrind esta instalado:
+
+	valgrind --leak-check=full ./programa
+
+
+ LISTAS DE ESTE PROYECTO
+--------------------------
+
+listae.c es la lista estatica. Tiene una capacidad fija de 100 enteros.
+
+listad.c es la lista dinamica. Reserva memoria con malloc/realloc y hay que
+llamar a destroy al terminar para liberar esa memoria.
+
+No compilar listae.c y listad.c juntos: los dos definen Lista, init, push,
+pop y las demas funciones con los mismos nombres.
+
+Ejemplo de prueba para la lista estatica:
+
+	gcc -Wall -Wextra -std=c11 -o programa main.c listae.c
+
+Ejemplo de prueba para la lista dinamica:
+
+	gcc -Wall -Wextra -std=c11 -o programa main.c listad.c
+
+Uso basico de la API:
+
+	Lista lista;
+	int valor;
+
+	init(&lista);
+	push(&lista, 10);
+	push(&lista, 20);
+	peek(&lista, &valor);       /* consulta el ultimo elemento */
+	pop(&lista, &valor);        /* elimina el ultimo elemento */
+	print(&lista);
+
+En la lista dinamica, al final:
+
+	destroy(&lista);
+
+Funciones principales:
+
+	init(lista)                  inicializa la lista
+	isempty(lista)               devuelve 1 si esta vacia
+	isfull(lista)                devuelve 1 si esta llena
+	size(lista)                  devuelve la cantidad de elementos
+	push(lista, valor)           agrega al final
+	push_front(lista, valor)     agrega al principio
+	pop(lista, &valor)           elimina el ultimo
+	pop_front(lista, &valor)     elimina el primero
+	peek(lista, &valor)           consulta el ultimo sin eliminarlo
+	get(lista, posicion, &valor) lee un elemento por posicion
+	insert(lista, posicion, valor) inserta en una posicion
+	remove_at(lista, posicion, &valor) elimina por posicion
+	find(lista, valor, &posicion) busca un valor
+	print(lista)                 muestra la lista
+
+Las posiciones empiezan en 0. Por ejemplo, en [10, 20, 30], la posicion 0
+contiene 10 y la posicion 2 contiene 30.
+
+
+----------------------------
+
+Ciclo for: se usa cuando conocemos o controlamos el numero de repeticiones.
+
+	for (int i = 0; i < 10; ++i) {
+		printf("%d\n", i);
+	}
+
+Sus tres partes son: inicializacion; condicion; actualizacion.
+
+Ciclo while: se repite mientras la condicion sea verdadera.
+
+	int i = 0;
+	while (i < 10) {
+		printf("%d\n", i);
+		++i;
+	}
+
+Ciclo do-while: se ejecuta al menos una vez y despues revisa la condicion.
+
+	int opcion;
+	do {
+		printf("1. Continuar  0. Salir: ");
+		scanf("%d", &opcion);
+	} while (opcion != 0);
+
+break termina el ciclo inmediatamente:
+
+	for (;;) {
+		if (condicion) {
+			break;
+		}
+	}
+
+continue salta al siguiente paso del ciclo:
+
+	for (int i = 0; i < 10; ++i) {
+		if (i % 2 == 0) {
+			continue;
+		}
+		printf("%d\n", i);
+	}
+
+
+--------------------------------------------
+
+La forma habitual es separar la declaracion en un archivo .h y la
+implementacion en un archivo .c.
+
+Archivo lista.h:
+
+	#ifndef LISTA_H
+	#define LISTA_H
+
+	typedef struct {
+		int elementos[100];
+		size_t cantidad;
+	} Lista;
+
+	void init(Lista *lista);
+	int push(Lista *lista, int valor);
+	int pop(Lista *lista, int *valor);
+	int peek(const Lista *lista, int *valor);
+	void print(const Lista *lista);
+
+	#endif
+
+El archivo lista.c incluye la cabecera y contiene los cuerpos de las
+funciones:
+
+	#include "lista.h"
+
+El archivo main.c incluye la cabecera para poder usar la API:
+
+	#include "lista.h"
+
+	int main(void)
+	{
+		Lista lista;
+		init(&lista);
+		push(&lista, 42);
+		print(&lista);
+		return 0;
+	}
+
+Compilar los archivos juntos:
+
+	gcc -Wall -Wextra -std=c11 -o programa main.c lista.c
+
+Las comillas en #include "lista.h" buscan el archivo en el proyecto. Los
+corchetes, por ejemplo #include <stdio.h>, buscan librerias del sistema.
+
+Importante: si se usa la lista dinamica, la declaracion de Lista debe tener
+int *elementos y tambien debe declararse destroy en el .h. La implementacion
+de listae.c y listad.c puede compartir una cabecera si solo se compila una
+de las dos en cada programa.
+
+
+6. ERRORES COMUNES
+------------------
+
+	./programa
+		El ejecutable se ejecuta desde la carpeta actual.
+
+	undefined reference to `main`
+		Falta una funcion main o se compilo el archivo equivocado.
+
+	No such file or directory
+		La terminal no esta en la carpeta correcta. Usar pwd y ls.
+
+	multiple definition
+		Se incluyeron dos implementaciones con funciones del mismo nombre.
+
+	Segmentation fault
+		Se accedio fuera del arreglo o se uso un puntero no inicializado.
+
+En C, cada bloque usa llaves y las instrucciones normalmente terminan en ;.

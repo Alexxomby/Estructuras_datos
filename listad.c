@@ -1,14 +1,9 @@
 /* Lista dinamica de enteros. */
 
-#include <stddef.h>
+#include "listad.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-
-typedef struct {
-	int *elementos;
-	size_t cantidad;
-	size_t capacidad;
-} Lista;
 
 void init(Lista *lista)
 {

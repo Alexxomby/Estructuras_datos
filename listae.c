@@ -1,14 +1,8 @@
 /* Lista estatica de enteros. */
 
-#include <stddef.h>
+#include "listae.h"
+
 #include <stdio.h>
-
-#define CAPACIDAD_LISTA 100
-
-typedef struct {
-	int elementos[CAPACIDAD_LISTA];
-	size_t cantidad;
-} Lista;
 
 void init(Lista *lista)
 {

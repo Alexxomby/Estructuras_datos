@@ -136,7 +136,7 @@ continue salta al siguiente paso del ciclo:
 	}
 
 
---------------------------------------------
+    --------------------------------------------
 
 La forma habitual es separar la declaracion en un archivo .h y la
 implementacion en un archivo .c.
